@@ -122,6 +122,9 @@ class CustomGauge extends StatefulWidget {
   ///Current value of the Gauge
   final double currentValue;
 
+  ///Current value of the Gauge
+  final double averageValue;
+
   ///Custom color for the needle on the Gauge. Defaults to Colors.black
   final Color needleColor;
 
@@ -153,6 +156,7 @@ class CustomGauge extends StatefulWidget {
       this.minValue = 0,
       this.maxValue = 100.0,
       this.currentValue,
+      this.averageValue,
       this.needleColor = Colors.black,
       this.defaultSegmentColor = Colors.grey,
       this.valueWidget,
@@ -199,6 +203,7 @@ class _CustomGaugeState extends State<CustomGauge> {
   Widget build(BuildContext context) {
     List<GaugeSegment> _segments = widget.segments;
     double _currentValue = widget.currentValue;
+    double _averageValue = widget.averageValue;
 
     if (widget.currentValue < widget.minValue) {
       _currentValue = widget.minValue;
@@ -246,25 +251,57 @@ class _CustomGaugeState extends State<CustomGauge> {
                       Offset(widget.gaugeSize * 0.8, widget.gaugeSize * 0.85),
                       widget.endMarkerStyle))
               : Container(),
-          Container(
-            height: widget.gaugeSize,
-            width: widget.gaugeSize,
-            alignment: Alignment.center,
-            child: Transform.rotate(
-              angle: (math.pi / 4) +
-                  ((_currentValue - widget.minValue) /
-                      (widget.maxValue - widget.minValue) *
-                      1.5 *
-                      math.pi),
-              child: ClipPath(
-                clipper: GaugeNeedleClipper(),
-                child: Container(
-                  width: widget.gaugeSize * 0.75,
-                  height: widget.gaugeSize * 0.75,
-                  color: widget.needleColor,
+          Stack(
+            children: [
+              Container(
+                height: widget.gaugeSize,
+                width: widget.gaugeSize,
+                alignment: Alignment.center,
+                child: Transform.rotate(
+                  angle: (math.pi / 3) +
+                      ((_currentValue - widget.minValue) /
+                          (widget.maxValue - widget.minValue) *
+                          1.5 *
+                          math.pi),
+                  child: Transform.translate(
+                    offset: Offset(0, widget.gaugeSize * 0.4),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(width: 6, color: Colors.grey),
+                          borderRadius:
+                              BorderRadius.circular(widget.gaugeSize * 0.16)),
+                      width: widget.gaugeSize * 0.16,
+                      height: widget.gaugeSize * 0.16,
+                    ),
+                  ),
                 ),
               ),
-            ),
+              Container(
+                height: widget.gaugeSize,
+                width: widget.gaugeSize,
+                alignment: Alignment.center,
+                child: Transform.rotate(
+                  angle: (math.pi / 3) +
+                      (((_averageValue) - widget.minValue) /
+                          (widget.maxValue - widget.minValue) *
+                          1.5 *
+                          math.pi),
+                  child: Transform.translate(
+                    offset: Offset(0, widget.gaugeSize * 0.4),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(width: 4, color: Colors.grey),
+                          borderRadius:
+                              BorderRadius.circular(widget.gaugeSize * 0.10)),
+                      width: widget.gaugeSize * 0.10,
+                      height: widget.gaugeSize * 0.10,
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
           Container(
             height: widget.gaugeSize,
